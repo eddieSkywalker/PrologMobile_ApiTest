@@ -1,11 +1,14 @@
+using System.Text.Json;
 using PrologMobile.Api.Clients;
+using PrologMobile.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddHttpClient<IPrologMobileClient, PrologMobileClient>((services, client) =>
+builder.Services.AddScoped<InventoryService>();
+builder.Services.AddHttpClient<IInventoryApiClient, InventoryApiClient>((services, client) =>
 {
     // Read the API address and key from the application's configuration.
     var configuration = services.GetRequiredService<IConfiguration>();
@@ -36,20 +39,26 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Retrieve and log the initial inventory records at application startup.
+// Make the call to the API and retrieve the records and log the aggregated inventory.
 try
 {
     using (var scope = app.Services.CreateScope())
     {
-        var client = scope.ServiceProvider.GetRequiredService<IPrologMobileClient>();
-        var inventory = await client.GetInventoryAsync();
+        var service = scope.ServiceProvider.GetRequiredService<InventoryService>();
+        var inventory = await service.GetCategorizedInventoryAsync();
 
-        app.Logger.LogInformation("Received {Count} records.", inventory.Records.Count);
+        // Log the aggregated inventory.
+        app.Logger.LogInformation("Aggregated inventory:{NewLine}{Inventory}",
+            Environment.NewLine,
+            JsonSerializer.Serialize(inventory, new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                WriteIndented = true
+            }));
     }
 }
 catch (Exception exception)
 {
-    app.Logger.LogError(exception, "Inventory request failed at {Timestamp}.", DateTimeOffset.Now);
+    app.Logger.LogError(exception, "Failed to retrieve and summarize all inventory records at {Timestamp}.", DateTimeOffset.Now);
 }
 
 app.Run();

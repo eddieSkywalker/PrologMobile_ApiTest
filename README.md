@@ -28,8 +28,12 @@
    dotnet run
    ```
 
-   At startup, the app requests one page and logs the number of records received. If the request fails, it logs the error and remains running.
+   At startup, the app runs and calls API to retrieve first page of orders as well as grabs metadata to determine total orders and pages needed to loop through. It logs each successful JSON response payload and the category summary in an indented format. If retrieval fails or the responses are inconsistent, it logs the error and remains running.
 
 ## API authentication
 
 The API key is sent in the `X-API-Key` request header.
+
+## Rate limiting
+
+When the Inventory API returns HTTP 429, the client retries that page up to four times. It waits for the `Retry-After` header when present; otherwise, it waits 1, 2, 3, and 4 seconds between retries. If the retries are exhausted, it logs that it could not retrieve and summarize all records, and the app continues starting without a summary.

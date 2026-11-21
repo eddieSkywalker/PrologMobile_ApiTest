@@ -2,10 +2,10 @@ using PrologMobile.Api.Models;
 
 namespace PrologMobile.Api.Clients;
 
-public interface IPrologMobileClient
+public interface IInventoryApiClient
 {
     Task<InventoryResponse> GetInventoryAsync(
-        int? page = null,
-        int? pageSize = null,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default);
 }

@@ -5,7 +5,7 @@ public class InventoryItem
     /// <summary>
     /// Unique identifier for the record
     /// </summary>
-    public int Id { get; init; }
+    public required int Id { get; init; }
     /// <summary>
     /// Product name 
     /// </summary>
@@ -17,13 +17,13 @@ public class InventoryItem
     /// <summary>
     /// Unit price, USD
     /// </summary>
-    public decimal Price { get; init; }
+    public required decimal Price { get; init; }
     /// <summary>
     /// Units on hand; may be 0 
     /// </summary>
-    public int Quantity { get; init; }
+    public required int Quantity { get; init; }
     /// <summary>
     /// Last updated timestamp for the inventory item
     /// </summary>
-    public DateTimeOffset LastUpdated { get; init; }
+    public required DateTimeOffset LastUpdated { get; init; }
 }
